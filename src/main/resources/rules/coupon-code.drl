@@ -1,0 +1,83 @@
+#created on: May 9, 2007
+package edu.apollogrp.jug.rules
+
+#list any import classes here.
+import edu.apollogrp.jug.model.Item;
+import edu.apollogrp.jug.model.Order;
+import edu.apollogrp.jug.model.CouponCode;
+
+rule "Some offers not valid with other offers"
+	salience 100
+	when
+		exists CouponCode( validWithOtherOffers == false )
+		invalid : CouponCode( validWithOtherOffers == true )
+	then
+		retract(invalid);
+end
+
+rule "Can't have more than one exclusive offer"
+	salience 100
+	when
+		CouponCode( validWithOtherOffers == false, aPrice : amount )
+		invalid : CouponCode( validWithOtherOffers == false, amount <= aPrice )
+	then
+		retract(invalid);
+end
+
+rule "Can't have more than 100% off"
+	salience 100
+	when
+		invalid : CouponCode( discountStyle == "percentage", amount > 100 )
+	then
+		retract(invalid);
+end
+
+rule "Discount certain types by a percentage"
+	salience 90
+	when
+		CouponCode( couponType : type != "all", discountStyle == "percentage", percent : amount )
+		Item( type == couponType, itemPrice : price, itemName : name )
+		order : Order()
+	then
+		order.addItem(
+			new Item("coupon",
+				"A " + percent + "% discount for all " + couponType + " items : " + itemName,
+				(int) Math.round((percent.intValue() * itemPrice.intValue()) / -100.0)));
+end
+
+rule "Discount certain types by a flat dollar amount"
+	salience 90
+	when
+		CouponCode( couponType : type != "all", discountStyle == "flat", discount : amount )
+		Item( type == couponType, itemName : name )
+		order : Order()
+	then
+		order.addItem(
+			new Item("coupon",
+				"$" + discount.intValue() + ".00 off each " + couponType + " item : " + itemName,
+				-100 * discount.intValue()));
+end
+
+rule "Discount order by a percentage, if over minimum"
+	salience 80
+	when
+		CouponCode( couponType : type == "all", discountStyle == "percentage", percent : amount )
+		order : Order( orderTotal : totalPrice > 1000 )
+	then
+		order.addItem(
+			new Item("coupon",
+				"A " + percent + "% discount off your order.",
+				(int) Math.round((percent.intValue() * orderTotal.intValue()) / -100.0)));
+end
+
+rule "Discount order by a flat dollar amount, if over minimum"
+	salience 80
+	when
+		CouponCode( couponType : type == "all", discountStyle == "flat", discount : amount )
+		order : Order( orderTotal : totalPrice > 1000 )
+	then
+		order.addItem(
+			new Item("coupon",
+				"$" + discount.intValue() + ".00 off your order.", -100 * discount.intValue()));
+end
+

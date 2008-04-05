@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
+	
+	<!-- ============================== -->
+	<!-- Append messages to the console -->
+	<!-- ============================== -->
+	
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out"/>
+		
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- The default pattern: Date Priority [Category] Message\n -->
+			<param name="ConversionPattern"
+				value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="FILE" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="lead-routing.log"/>
+		<param name="Append" value="false"/>
+		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+		</layout>
+	</appender>
+
+	<!-- ================ -->
+	<!-- Limit categories -->
+	<!-- ================ -->
+	
+	<category name="org.apache">
+		<priority value="error"/>
+	</category>
+	
+	<category name="net.sf">
+		<priority value="error"/>
+	</category>
+	
+	<category name="org.springframework">
+		<priority value="error"/>
+	</category>
+	
+	<category name="org.hibernate">
+		<priority value="error"/>
+	</category>
+	
+	<category name="edu.apollogrp.qtask.routing.rules">
+		<priority value="error"/>
+	</category>
+
+	<category name="edu.apollogrp.qtask.routing.rules.impl.HuntGroupRules">
+		<priority value="error"/>
+	</category>
+	
+	<category name="edu.apollogrp.qtask.routing.dao">
+		<priority value="error"/>
+	</category>
+	
+	<category name="edu.apollogrp.qtask.routing.QuotaTest">
+		<priority value="error"/>
+	</category>
+	
+	<category name="edu.apollogrp.qtask.routing.impl.LeadRoutingSvcImpl">
+		<priority value="debug"/>
+	</category>
+	
+	<category name="edu.apollogrp.qtask.routing.rules.BaseAbstractRules">
+		<priority value="debug"/>
+	</category>
+	
+	
+	<!-- ======================= -->
+	<!-- Setup the Root category -->
+	<!-- ======================= -->
+	
+	<root>
+		<level value="ERROR"/>
+		<appender-ref ref="CONSOLE"/>
+	</root>
+	
+</log4j:configuration>

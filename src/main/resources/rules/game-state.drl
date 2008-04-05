@@ -1,0 +1,78 @@
+#created on: Feb 13, 2007
+package edu.apollogrp.jug.rules
+
+#list any import classes here.
+import edu.apollogrp.jug.model.GameState;
+
+rule "Say as often as needed"
+    salience 100
+	when
+		state: GameState( sayThis matches ".+" ) 
+	then 
+		state.sayIt();
+		state.setSayThis("");
+		modify(state);
+end
+
+rule "Ask as often as needed"
+    salience 90
+	when
+		state: GameState( needResponse == true ) 
+	then 
+		state.askForResponse();
+		state.setNeedResponse(false);
+		modify(state);
+end
+
+rule "Ask for the name if we don't know it"
+	when
+		state: GameState( step == 1, response == "" ) 
+	then 
+		state.setSayThis("Please type your name:");
+		state.setNeedResponse(true);
+		modify(state);
+end
+
+rule "Welcome the person"
+	when
+		state: GameState( step == 1, name : response matches ".+" ) 
+	then 
+		state.setSayThis("Welcome, " + name + ".");
+		state.setResponse("");
+		state.setStep(2);
+		modify(state);
+end
+
+
+rule "Ask them to choose left or right"
+	when
+		state: GameState( step == 2, response == "" ) 
+		
+	then 
+		state.setSayThis("Please choose left or right:");
+		state.setNeedResponse(true);
+		modify(state);
+end
+
+rule "Right is everlasting life."
+	when
+		state: GameState( step == 2, response matches "^[rR].*" ) 
+		
+	then 
+		state.setSayThis("You have chosen wisely.  Congratulations.");
+		state.setResponse("");
+		state.setStep(3);
+		modify(state);
+end
+
+rule "Left is certain death."
+	when
+		state: GameState( step == 2, response matches "^[^rR].*" ) 
+		
+	then 
+		state.setSayThis("You have chosen poorly.  Try again.");
+		state.setResponse("");
+		state.setStep(1);
+		modify(state);
+end
+

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
+http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.0.xsd
+http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd	">
+
+	 <!-- Used to create a rules package from excel files -->
+    <bean id="scriptRulesPackageFactory"
+          class="edu.apollogrp.qtask.jboss.rules.PackageFactory">
+        <property name="drlResourcePath" value="classpath:rules/*.drl"/>
+        <property name="packageBuilderConfiguration">
+            <bean class="org.drools.compiler.PackageBuilderConfiguration">
+                <property name="compiler" value="1"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- Rules Base that is used by assert facts into -->
+    <bean id="scriptRuleBase"
+          class="edu.apollogrp.qtask.jboss.rules.RuleBaseBeanFactory">
+        <property name="packageFactory" ref="scriptRulesPackageFactory"/>
+    </bean>
+
+    <bean id="rulesService" class="edu.apollogrp.task.service.impl">
+        <property name="scriptRuleBase" ref="scriptRuleBase"/>
+    </bean>
+
+</beans>
